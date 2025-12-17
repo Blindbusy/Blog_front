@@ -1,0 +1,71 @@
+.main-container {
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+}
+
+.rect {
+  z-index: 2;
+  width: 200px;
+  height: 200px;
+  background-color: transparent;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform-style: preserve-3d;
+  transform: translate(-50%, -50%) rotateX(-20deg) rotateY(30deg);
+
+  .surf {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    opacity: 0.4;
+    border: 2px solid #333;
+  }
+  .surf_1 {
+    background-color: red;
+    transform: rotateY(0deg) translateZ(100px);
+  }
+  .surf_2 {
+    background-color: green;
+    transform: rotateY(180deg) translateZ(100px);
+  }
+  .surf_3 {
+    background-color: blue;
+    transform: rotateY(90deg) translateZ(100px);
+  }
+  .surf_4 {
+    background-color: yellow;
+    transform: rotateY(-90deg) translateZ(100px);
+  }
+  .surf_5 {
+    background-color: pink;
+    transform: rotateX(90deg) translateZ(100px);
+  }
+  .surf_6 {
+    background-color: orange;
+    transform: rotateX(-90deg) translateZ(100px);
+  }
+}
+
+.Horizontal {
+  overflow: hidden;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.Horizontal__text {
+  display: flex;
+  width: max-content;
+  white-space: nowrap;
+  gap: 4vw;
+  margin-left: 90vw;
+}
+
+.heading-xl {
+  font-size: clamp(2rem, 10vw, 12rem);
+  font-weight: 600;
+  line-height: 1.1;
+}

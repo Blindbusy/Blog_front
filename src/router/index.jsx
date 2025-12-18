@@ -3,6 +3,7 @@ import { Suspense, lazy } from 'react'
 import Loading from '@/components/Loading/Loading'
 
 const Index = lazy(() => import('@/pages/Index/index.jsx'))
+const A = lazy(() => import('@/pages/A/index.jsx'))
 
 const router = createBrowserRouter([
   {
@@ -17,6 +18,14 @@ const router = createBrowserRouter([
   //   path: '/loading',
   //   element: <Loading />,
   // },
+  {
+    path: '/A',
+    element: (
+      <Suspense fallback={<Loading />}>
+        <A />
+      </Suspense>
+    ),
+  }
 ])
 
 export default router

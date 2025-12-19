@@ -1,3 +1,4 @@
+import { DoubleRightOutlined } from '@ant-design/icons'
 import { gsap } from 'gsap'
 import SplitText from 'gsap/SplitText'
 import ScrollTrigger from 'gsap/ScrollTrigger'
@@ -21,18 +22,23 @@ const A = () => {
     '#384eb8ff',
     '#FF6B6B',
   ])
+
+  // top-container上的动画（字符、下箭头、圆形过渡、logo移动）
   useEffect(() => {
     gsap.registerPlugin(SplitText, ScrollTrigger)
-    const container = document.querySelector('.container')
     const items = document.querySelectorAll('.item')
 
+    // 拆分每个item的字符，为每个字符添加动画
     items.forEach((item, index) => {
       const split = SplitText.create(item, { type: 'chars' })
+      const fontSize = `${size.current[index]}rem`
+      const color = charColor.current[index]
       split.chars.forEach(char => {
-        char.style.color = charColor.current[index]
-        char.style.fontSize = `${size.current[index]}rem`
-        char.style.lineHeight = `${size.current[index]}rem`
+        char.style.color = color
+        char.style.fontSize = fontSize
+        char.style.lineHeight = fontSize
         gsap.from(char, {
+          opacity: 0.5,
           xPercent: 'random(-2000, 2000)',
           yPercent: 'random(-800, 800)',
           rotation: 'random(-180, 180)',
@@ -40,35 +46,131 @@ const A = () => {
           rotationY: 'random(-180, 180)',
           ease: 'none',
           scrollTrigger: {
-            trigger: '.top-bg',
-            start: 'top 60px',
+            trigger: '.top-container',
+            start: 'top 0',
             end: '+=100vh',
             scrub: 1.5,
-            once: true,
+            // once: true,
           },
         })
       })
     })
 
-    const mainTrigger = ScrollTrigger.create({
-      trigger: '.top-bg',
-      start: 'top 60px',
-      end: '+=200vh', // 增加滚动距离以适应动画
-      pin: '.top-bg', // 明确指定要固定的元素
+    // logo动画
+    const logo =document.querySelector('.nav-logo')
+    if (logo) {
+      // 获取logo元素的尺寸
+      const logoRect = logo.getBoundingClientRect();
+      const logoWidth = logoRect.width;
+      const logoHeight = logoRect.height;
+      
+      // 计算屏幕中心位置
+      const screenCenterX = window.innerWidth / 2;
+      const screenCenterY = window.innerHeight / 2;
+      
+      // 计算logo在左上角位置时的坐标（考虑logo自身的尺寸）
+      const topLeftX = 20 + logoWidth / 2; // 20px是.nav的padding-left
+      const topLeftY = 50 + logoHeight / 2; // 50px是.nav的height的一半
+      
+      // 设置logo初始位置在屏幕中心
+      gsap.set(logo, {
+        x: screenCenterX - topLeftX,
+        y: screenCenterY - topLeftY,
+      });
+      
+      // 创建从中心到左上角的动画
+      gsap.to(logo, 
+        {
+          x: 0,
+          y: 0,
+          scrollTrigger: {
+            trigger: '.top-container',
+            start: 'top 0',
+            end: '+=50vh',
+            scrub: 1.5,
+          },
+          clearProps: 'all',
+        }
+      )
+    }
+
+    // 下箭头动画
+    const downArrow = document.querySelector('.down-arrow')
+    if (downArrow) {
+      // 箭头从屏幕上方移动到下方的动画
+      gsap.fromTo(downArrow, 
+        {
+          yPercent: -100, // 初始位置：屏幕上方（隐藏）
+          opacity: 0
+        },
+        {
+          yPercent: -10, // 结束位置：原始位置
+          opacity: 1,
+          scrollTrigger: {
+            trigger: '.top-container',
+            start: '+=100vh',
+            end: '+=200vh',
+            scrub: 1,
+          }
+        }
+      )
+      
+      // 添加闪烁动画
+      gsap.to(downArrow, {
+        y: 8, // 下移距离
+        repeat: -1,
+        yoyo: true,
+        duration: 1,
+        ease: 'sine.inOut'
+      })
+    }
+
+    // top-container 圆形过渡动画
+    const topContainer = document.querySelector('.top-container')
+    if (topContainer) {
+      gsap.to(topContainer, 
+        {
+          borderRadius: '0 0 50% 50%',
+          scrollTrigger: {
+            trigger: '.top-container',
+            start: '+=100vh',
+            end: '+=250vh', 
+            scrub: 1,
+          }
+        }
+      )
+    }
+
+    // 创建一个滚动触发器，固定 top-container 元素
+    const topContainerTrigger = ScrollTrigger.create({
+      trigger: '.top-container',
+      start: 'top 0',
+      end: '+=250vh', // 增加滚动距离以适应动画
+      pin: '.top-container', // 明确指定要固定的元素
       pinSpacing: true, // 保持占位空间
     })
 
     return () => {
+      // 销毁所有字符滚动触发器
       ScrollTrigger.getAll().forEach(trigger => trigger.kill())
+      topContainerTrigger.kill() // 销毁 top-container 触发器
+      gsap.killTweensOf(logo) // 销毁 logo 动画
+      gsap.killTweensOf(downArrow) // 销毁下箭头动画
+      gsap.killTweensOf(topContainer) // 销毁 top-container 动画
+      items.forEach(item => {
+        gsap.killTweensOf(item) // 销毁字符动画
+      })
     }
   }, [])
 
   return (
     <>
       <div className="main-container">
-        <div className="nav"></div>
-        <section className="top-bg">
-          <div className="container">
+        <div className="nav">
+          <img src="/logo.svg" alt="Logo" className="nav-logo" />
+        </div>
+        <section className="top-container">
+          <div className="char-container">
             <div className="item">Hola</div>
             <div className="item">你好</div>
             <div className="item">Ciao</div>
@@ -81,8 +183,9 @@ const A = () => {
             <div className="item">Olá</div>
             <div className="item">Привет</div>
             <div className="item">Hej</div>
-            <div className="item">Cześć</div>
+            <div className="item">Selam</div>
           </div>
+          <DoubleRightOutlined className="down-arrow" />
         </section>
       </div>
     </>

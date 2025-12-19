@@ -38,9 +38,9 @@ const A = () => {
         char.style.fontSize = fontSize
         char.style.lineHeight = fontSize
         gsap.from(char, {
-          opacity: 0.5,
-          xPercent: 'random(-2000, 2000)',
-          yPercent: 'random(-800, 800)',
+          opacity: 0.7,
+          xPercent: 'random(-500, 500)',
+          yPercent: 'random(-300, 300)',
           rotation: 'random(-180, 180)',
           rotationX: 'random(-180, 180)',
           rotationY: 'random(-180, 180)',
@@ -50,6 +50,7 @@ const A = () => {
             start: 'top 0',
             end: '+=100vh',
             scrub: 1.5,
+            invalidateOnRefresh: true,
             // once: true,
           },
         })
@@ -57,51 +58,51 @@ const A = () => {
     })
 
     // logo动画
-    const logo =document.querySelector('.nav-logo')
+    const logo = document.querySelector('.nav-logo')
     if (logo) {
-      // 获取logo元素的尺寸
-      const logoRect = logo.getBoundingClientRect();
-      const logoWidth = logoRect.width;
-      const logoHeight = logoRect.height;
-      
       // 计算屏幕中心位置
-      const screenCenterX = window.innerWidth / 2;
-      const screenCenterY = window.innerHeight / 2;
-      
-      // 计算logo在左上角位置时的坐标（考虑logo自身的尺寸）
-      const topLeftX = 20 + logoWidth / 2; // 20px是.nav的padding-left
-      const topLeftY = 50 + logoHeight / 2; // 50px是.nav的height的一半
-      
-      // 设置logo初始位置在屏幕中心
+      const screenCenterX = window.innerWidth / 2
+      const screenCenterY = window.innerHeight / 2
+
+      // 使用GSAP的transformOrigin来确保缩放时以中心点进行缩放
       gsap.set(logo, {
-        x: screenCenterX - topLeftX,
-        y: screenCenterY - topLeftY,
-      });
-      
+        scale: 3.5,
+        backgroundColor: 'rgba(0, 0, 0, 0.1)',
+        xPercent: -50,
+        yPercent: -50,
+        x: screenCenterX,
+        y: screenCenterY,
+        transformOrigin: 'center center',
+      })
+
       // 创建从中心到左上角的动画
-      gsap.to(logo, 
-        {
-          x: 0,
-          y: 0,
-          scrollTrigger: {
-            trigger: '.top-container',
-            start: 'top 0',
-            end: '+=50vh',
-            scrub: 1.5,
-          },
-          clearProps: 'all',
-        }
-      )
+      gsap.to(logo, {
+        x: 0,
+        y: 0,
+        xPercent: 0,
+        yPercent: 0,
+        scale: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        ease: 'power4.inOut',
+        scrollTrigger: {
+          trigger: '.top-container',
+          start: 'top 0',
+          end: '+=100vh',
+          scrub: 2,
+          invalidateOnRefresh: true,
+        },
+      })
     }
 
     // 下箭头动画
     const downArrow = document.querySelector('.down-arrow')
     if (downArrow) {
       // 箭头从屏幕上方移动到下方的动画
-      gsap.fromTo(downArrow, 
+      gsap.fromTo(
+        downArrow,
         {
           yPercent: -100, // 初始位置：屏幕上方（隐藏）
-          opacity: 0
+          opacity: 0,
         },
         {
           yPercent: -10, // 结束位置：原始位置
@@ -111,36 +112,37 @@ const A = () => {
             start: '+=100vh',
             end: '+=200vh',
             scrub: 1,
-          }
+            invalidateOnRefresh: true,
+          },
         }
       )
-      
+
       // 添加闪烁动画
       gsap.to(downArrow, {
         y: 8, // 下移距离
         repeat: -1,
         yoyo: true,
         duration: 1,
-        ease: 'sine.inOut'
+        ease: 'sine.inOut',
       })
     }
 
     // top-container 圆形过渡动画
     const topContainer = document.querySelector('.top-container')
     if (topContainer) {
-      gsap.to(topContainer, 
-        {
-          borderRadius: '0 0 50% 50%',
-          scrollTrigger: {
-            trigger: '.top-container',
-            start: '+=100vh',
-            end: '+=250vh', 
-            scrub: 1,
-          }
-        }
-      )
+      gsap.to(topContainer, {
+        borderRadius: '0 0 50% 50%',
+        scrollTrigger: {
+          trigger: '.top-container',
+          start: '+=150vh',
+          end: '+=250vh',
+          scrub: 1,
+          invalidateOnRefresh: true,
+        },
+      })
     }
 
+    const nav = document.querySelector('.nav')
     // 创建一个滚动触发器，固定 top-container 元素
     const topContainerTrigger = ScrollTrigger.create({
       trigger: '.top-container',
@@ -148,6 +150,20 @@ const A = () => {
       end: '+=250vh', // 增加滚动距离以适应动画
       pin: '.top-container', // 明确指定要固定的元素
       pinSpacing: true, // 保持占位空间
+      anticipatePin: true, // 预测pin状态以减少白边
+      invalidateOnRefresh: true, // 在窗口大小调整时重新计算
+      onEnter: () => {
+        nav.style.backdropFilter = 'none'
+      },
+      onLeave: () => {
+        nav.style.backdropFilter = 'blur(10px)'
+      },
+      onEnterBack: () => {
+        nav.style.backdropFilter = 'none'
+      },
+      onLeaveBack: () => {
+        nav.style.backdropFilter = 'none'
+      },
     })
 
     return () => {

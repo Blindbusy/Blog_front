@@ -168,7 +168,7 @@ const A = () => {
         nav.style.backdropFilter = 'none'
       },
       onLeave: () => {
-        nav.style.backdropFilter = 'blur(10px)'
+        nav.style.backdropFilter = 'blur(3px)'
       },
       onEnterBack: () => {
         nav.style.backdropFilter = 'none'
